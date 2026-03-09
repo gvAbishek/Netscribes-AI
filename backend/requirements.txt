@@ -1,0 +1,10 @@
+fastapi[standard]
+uvicorn[standard]
+openai
+firebase-admin
+python-dotenv
+pydantic-settings
+PyJWT
+cryptography
+requests
+motor
