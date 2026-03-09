@@ -1,73 +1,99 @@
-# Welcome to your Lovable project
+# AI Compass — Netscribes AI Bot
 
-## Project info
+AI Compass is a comprehensive full-stack AI platform designed for interacting with LLMs in various modes, including Direct LLM, Agent-based workflows, and Retrieval-Augmented Generation (RAG).
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🚀 Architecture Overview
 
-## How can I edit this code?
+The project is split into two main components:
+- **Frontend**: A modern React application built with Vite, TypeScript, and Tailwind CSS.
+- **Backend**: A high-performance FastAPI service that manages AI interactions, database connections, and authentication.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## ✨ Key Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Multiple AI Modes**: Switch between Direct LLM, Agent, and RAG modes for different use cases.
+- **Authentication**: Secure login and signup using Firebase Authentication.
+- **Persistent History**: Chat history and user details are stored in Azure Cosmos DB (MongoDB).
+- **Responsive UI**: A sleek, dark-mode-first design built with shadcn/ui and Framer Motion for smooth animations.
+- **Health Monitoring**: Built-in health check endpoints for the backend service.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🛠 Tech Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Frontend
+- **Framework**: React 18 (Vite)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS & shadcn/ui
+- **Auth**: Firebase Client SDK
+- **State Management**: React Hook Form & Zod
+- **Icons**: Lucide React
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Backend
+- **Framework**: FastAPI (Python)
+- **Database**: Azure Cosmos DB for MongoDB (via `motor`)
+- **AI Integration**: OpenAI API
+- **Auth**: Firebase Admin SDK
+- **Environment**: Pydantic Settings & Dotenv
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## ⚙️ Getting Started
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 1. Prerequisites
+- **Node.js**: v18+
+- **Python**: v3.10+
+- **Firebase Project**: Service account and client config.
+- **OpenAI API Key**
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 2. Frontend Setup
+```bash
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### 3. Backend Setup
+```bash
+cd backend
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-**Use GitHub Codespaces**
+# Install dependencies
+pip install -r requirements.txt
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Configure environment
+cp .env.example .env  # Update with your secrets
 
-## What technologies are used for this project?
+# Start the server
+uvicorn main:app --reload --port 8000
+```
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📁 Project Structure
 
-## How can I deploy this project?
+```text
+Netscribes-AI-Bot/
+├── backend/            # FastAPI Python server
+│   ├── routers/        # API route handlers
+│   ├── database.py     # Cosmos DB logic
+│   └── auth.py         # Firebase Admin integration
+├── src/                # React application code
+│   ├── components/     # UI components (shadcn)
+│   ├── pages/          # Application views
+│   └── context/        # Auth & Theme state
+├── public/             # Static assets
+└── package.json        # Frontend dependencies
+```
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## 📡 Deployment
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+The codebase is prepared for cross-platform deployment. Ensure that the CORS settings in the backend (`config.py`) are updated to match your production frontend URL.
