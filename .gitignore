@@ -39,3 +39,6 @@ backend/__pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Local instructions
+commands.txt

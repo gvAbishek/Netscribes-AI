@@ -42,9 +42,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
-  const syncUser = async (firebaseUser: User) => {
+  const syncUser = async (firebaseUser: User, forceRefresh: boolean = false) => {
     try {
-      const token = await firebaseUser.getIdToken();
+      const token = await firebaseUser.getIdToken(forceRefresh);
       await fetch('http://localhost:8000/api/users/sync', {
         method: 'POST',
         headers: {
@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUpWithEmail = async (email: string, password: string, displayName: string) => {
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(credential.user, { displayName });
-    await syncUser(credential.user);
+    await syncUser(credential.user, true);
   };
 
   const signInWithGoogle = async () => {

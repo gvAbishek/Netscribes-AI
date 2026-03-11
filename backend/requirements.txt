@@ -8,3 +8,6 @@ PyJWT
 cryptography
 requests
 motor
+python-multipart
+duckduckgo-search
+

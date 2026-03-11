@@ -3,6 +3,8 @@ export interface ChatMessage {
   role: "user" | "bot";
   content: string;
   timestamp: Date;
+  attachment?: string;
+  references?: { title: string; url: string }[];
 }
 
 export interface ChatSession {
