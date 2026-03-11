@@ -10,4 +10,5 @@ requests
 motor
 python-multipart
 duckduckgo-search
+certifi
 

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ChatMessage, ChatMode, mockChatHistory } from "@/lib/mock-data";
+import { API_BASE_URL } from "@/lib/api";
 
 const modeInfo: Record<ChatMode, { label: string; icon: React.ElementType; color: string }> = {
   llm: { label: "Direct LLM", icon: Bot, color: "text-primary" },
@@ -148,7 +149,7 @@ const Dashboard = () => {
       formData.append("mode", mode);
       formData.append("history", JSON.stringify(historyItems));
       
-      let endpoint = "http://127.0.0.1:8000/api/chat";
+      let endpoint = `${API_BASE_URL}/api/chat`;
       
       if (currentFile) {
         formData.append("file", currentFile);
@@ -156,7 +157,7 @@ const Dashboard = () => {
         const imageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
         
         if (ext && !imageExtensions.includes(ext)) {
-          endpoint = "http://127.0.0.1:8000/api/chat/upload";
+          endpoint = `${API_BASE_URL}/api/chat/upload`;
         }
       }
 

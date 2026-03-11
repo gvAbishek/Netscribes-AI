@@ -9,6 +9,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
+import { API_BASE_URL } from "@/lib/api";
 
 interface AuthContextType {
   user: User | null;
@@ -45,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const syncUser = async (firebaseUser: User, forceRefresh: boolean = false) => {
     try {
       const token = await firebaseUser.getIdToken(forceRefresh);
-      await fetch('http://localhost:8000/api/users/sync', {
+      await fetch(`${API_BASE_URL}/api/users/sync`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

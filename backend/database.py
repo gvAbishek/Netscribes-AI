@@ -1,4 +1,5 @@
 import logging
+import certifi
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import settings
 
@@ -15,7 +16,10 @@ class DatabaseManager:
             return
 
         try:
-            cls.client = AsyncIOMotorClient(settings.cosmos_db_url)
+            cls.client = AsyncIOMotorClient(
+                settings.cosmos_db_url,
+                tlsCAFile=certifi.where()
+            )
             cls.db = cls.client[settings.cosmos_db_name]
             logger.info(f"Successfully connected to Cosmos DB: {settings.cosmos_db_name}")
         except Exception as e:
