@@ -4,6 +4,8 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   attachment?: string;
+  fileName?: string;
+  fileType?: string;
   references?: { title: string; url: string }[];
 }
 

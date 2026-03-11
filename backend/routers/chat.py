@@ -9,6 +9,7 @@ from duckduckgo_search import DDGS
 
 from auth import get_current_user
 from config import settings
+from file_utils import extract_text_from_file
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
@@ -113,7 +114,7 @@ async def chat(
     file: UploadFile | None = File(None),
     user: dict = Depends(get_current_user)
 ):
-    """Send a message to the OpenAI model and return the reply."""
+    """Send a message to the OpenAI model and return the reply. Handles text and images."""
 
     try:
         history_list = json.loads(history)
@@ -131,15 +132,27 @@ async def chat(
 
     # 2. Add current message (handle text + image)
     if file:
-        file_bytes = await file.read()
-        encoded = base64.b64encode(file_bytes).decode("utf-8")
-        mime_type = file.content_type or "image/jpeg"
+        # Check if file is an image
+        image_extensions = ["png", "jpg", "jpeg", "gif", "webp"]
+        ext = file.filename.split(".")[-1].lower() if file.filename else ""
         
-        user_content = [
-            {"type": "text", "text": message},
-            {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{encoded}"}}
-        ]
-        messages.append({"role": "user", "content": user_content})
+        if ext in image_extensions:
+            file_bytes = await file.read()
+            encoded = base64.b64encode(file_bytes).decode("utf-8")
+            mime_type = file.content_type or "image/jpeg"
+            
+            user_content = [
+                {"type": "text", "text": message},
+                {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{encoded}"}}
+            ]
+            messages.append({"role": "user", "content": user_content})
+        else:
+            # If it's not an image, we should probably still handle it or error out
+            # Requirement says "/chat" should handle images, "/chat/upload" handles docs.
+            # If a doc is sent here, we can either extract text or return error.
+            # User said: "Images should be sent to /chat endpoint directly" for the OTHER endpoint.
+            # Let's keep /chat strictly for text or image.
+            messages.append({"role": "user", "content": message})
     else:
         messages.append({"role": "user", "content": message})
 
@@ -184,5 +197,89 @@ async def chat(
 
     reply = response_message.content or ""
     # Remove duplicate references based on URL
+    unique_refs = {ref['url']: ref for ref in all_references}.values()
+    return ChatResponse(reply=reply, references=list(unique_refs))
+
+@router.post("/chat/upload", response_model=ChatResponse)
+async def chat_upload(
+    file: UploadFile = File(...),
+    message: str = Form(...),
+    mode: str = Form("llm"),
+    history: str = Form("[]"),
+    user: dict = Depends(get_current_user)
+):
+    """Handles document uploads (PDF, DOCX, etc.), extracts text, and chats."""
+    
+    # Check for images accidentally sent here
+    image_extensions = ["png", "jpg", "jpeg", "gif", "webp"]
+    ext = file.filename.split(".")[-1].lower() if file.filename else ""
+    if ext in image_extensions:
+        raise HTTPException(status_code=400, detail="Images should be sent to /chat endpoint directly")
+
+    # Extract text
+    file_bytes = await file.read()
+    extracted_text = extract_text_from_file(file.filename or "file", file_bytes)
+    
+    if extracted_text in ["File appears to be empty", "Could not read file", "Password protected PDFs are not supported"] or extracted_text.startswith("Unsupported file extension") or extracted_text.startswith("Could not read file"):
+        raise HTTPException(status_code=400, detail=extracted_text)
+
+    # Prepare message with extracted text
+    full_message = f"User Message: {message}\n\nExtracted Content from {file.filename}:\n{extracted_text}"
+
+    # Reuse chat logic (modified to be a helper if needed, but for now I'll just call the core logic)
+    # Actually, simpler to just implement the completion call here or refactor.
+    # Refactoring would be cleaner.
+    
+    try:
+        history_list = json.loads(history)
+    except Exception:
+        history_list = []
+
+    system_prompt = SYSTEM_PROMPTS.get(mode, SYSTEM_PROMPTS["llm"])
+    messages: list[dict] = [{"role": "system", "content": system_prompt}]
+
+    for msg in history_list:
+        role = "assistant" if msg.get("role") == "bot" else "user"
+        messages.append({"role": role, "content": msg.get("content", "")})
+
+    messages.append({"role": "user", "content": full_message})
+
+    completion = client.chat.completions.create(
+        model=settings.azure_openai_model,
+        messages=messages,
+        tools=TOOLS,
+        tool_choice="auto",
+        temperature=0.7,
+        max_tokens=8192,
+    )
+
+    response_message = completion.choices[0].message
+    # No tool handling for now in /chat/upload to keep it simple, or should I?
+    # User didn't specify tools for upload, but it's good practice.
+    # I'll include basic tool handling to be consistent.
+    
+    all_references = []
+    while response_message.tool_calls:
+        messages.append(response_message)
+        for tool_call in response_message.tool_calls:
+            if tool_call.function.name == "internet_search":
+                args = json.loads(tool_call.function.arguments)
+                tool_result, references = internet_search(args["query"])
+                all_references.extend(references)
+                messages.append({
+                    "tool_call_id": tool_call.id,
+                    "role": "tool",
+                    "name": "internet_search",
+                    "content": tool_result,
+                })
+        completion = client.chat.completions.create(
+            model=settings.azure_openai_model,
+            messages=messages,
+            tools=TOOLS,
+            tool_choice="auto"
+        )
+        response_message = completion.choices[0].message
+
+    reply = response_message.content or ""
     unique_refs = {ref['url']: ref for ref in all_references}.values()
     return ChatResponse(reply=reply, references=list(unique_refs))
