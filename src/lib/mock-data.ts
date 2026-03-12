@@ -9,22 +9,15 @@ export interface ChatMessage {
   references?: { title: string; url: string }[];
 }
 
-export interface ChatSession {
+export interface Conversation {
   id: string;
   title: string;
-  lastMessage: string;
-  date: string;
+  created_at: string;
+  updated_at: string;
+  share_token?: string | null;
 }
 
 export type ChatMode = "llm" | "agent" | "rag";
-
-export const mockChatHistory: ChatSession[] = [
-  { id: "1", title: "Company Policy Questions", lastMessage: "What is the leave policy?", date: "Today" },
-  { id: "2", title: "Code Review Help", lastMessage: "Review this function...", date: "Today" },
-  { id: "3", title: "Onboarding Guide", lastMessage: "How do I set up my dev env?", date: "Yesterday" },
-  { id: "4", title: "Q3 Report Analysis", lastMessage: "Summarize the revenue data", date: "Yesterday" },
-  { id: "5", title: "API Documentation", lastMessage: "How does the auth endpoint work?", date: "Mar 2" },
-];
 
 export const modeResponses: Record<ChatMode, string[]> = {
   llm: [

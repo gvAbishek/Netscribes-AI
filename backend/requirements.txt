@@ -11,4 +11,11 @@ motor
 python-multipart
 duckduckgo-search
 certifi
-
+azure-storage-blob
+azure-ai-documentintelligence
+azure-search-documents
+sse-starlette
+aiohttp
+aiofiles
+python-docx
+fpdf2

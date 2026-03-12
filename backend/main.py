@@ -1,6 +1,6 @@
 """
 AI Compass — FastAPI Backend
-
+Reload Trigger: 7.1
 Entry point. Run with:
     cd backend && uvicorn main:app --reload --port 8000
 """
@@ -18,6 +18,7 @@ from database import db_manager
 from routers import chat as chat_router
 from routers import history as history_router
 from routers import users as users_router
+from routers import admin as admin_router
 
 # ---------------------------------------------------------------------------
 # App Lifespan
@@ -55,6 +56,7 @@ app.add_middleware(
 app.include_router(chat_router.router)
 app.include_router(history_router.router)
 app.include_router(users_router.router)
+app.include_router(admin_router.router)
 
 
 # ---------------------------------------------------------------------------

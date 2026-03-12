@@ -9,9 +9,9 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
-import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import NewLandingPage from "./pages/NewLandingPage";
+import SharedConversation from "./pages/SharedConversation";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -48,7 +48,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/shared/:token" element={<SharedConversation />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

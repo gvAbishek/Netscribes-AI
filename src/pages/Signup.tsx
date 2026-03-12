@@ -10,6 +10,14 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 const Signup = () => {
   const { theme, toggleTheme } = useTheme();
   const { signUpWithEmail, signInWithGoogle } = useAuth();
@@ -19,6 +27,7 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(false);
 
   const getFirebaseErrorMessage = (code: string): string => {
@@ -53,7 +62,7 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      await signUpWithEmail(email, password, name);
+      await signUpWithEmail(email, password, name, role);
       toast.success("Account created successfully! 🎉");
       navigate("/dashboard");
     } catch (error: any) {
@@ -143,6 +152,20 @@ const Signup = () => {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input id="confirm" type={showPassword ? "text" : "password"} placeholder="••••••••" className="pl-9" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required disabled={loading} />
                 </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="role">Your Role</Label>
+                <Select value={role} onValueChange={setRole} disabled={loading}>
+                  <SelectTrigger id="role" className="w-full">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="finance">Finance</SelectItem>
+                    <SelectItem value="engineering">Engineering</SelectItem>
+                    <SelectItem value="user">User</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating account...</> : "Create account"}
